@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Cobus Contact Cards</title>
-
 <style id="app-style">
 /* Matter — Displaay Type Foundry, licensed to CaetanoBus for web use.
    Subset to Latin + Latin Extended-A and served via @font-face, which is
@@ -419,6 +418,7 @@ var search = "";
 var pendingDelete = null;  /* id awaiting a second click - sandboxed frames may block confirm() */
 var confirmDiscard = false;
 var showImport = false;
+var staleDraftDropped = false;  /* a draft from an older version was thrown away */
 /* The runtime cannot tell us up front whether this viewer may write: a
    read-only view resolves the capability just the same and only its publish
    is rejected. So we learn it from the first not_writer/not_granted and
@@ -1050,6 +1050,16 @@ function saveVcf(p){
 /* ============================================================
    6. editor
    ============================================================ */
+/* A draft is only meaningful on top of the version it was started from.
+   Stamp it with a fingerprint of the published data, so a draft left in this
+   browser can never shadow a newer version published from somewhere else. */
+function fingerprint(o){
+  var s = JSON.stringify(o), h = 5381;
+  for(var i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+  return s.length + "." + h.toString(36);
+}
+var PUBLISHED_FP = fingerprint(data);
+
 function ensureDraft(){
   if(draft) return;
   var stored = null;
@@ -1057,19 +1067,29 @@ function ensureDraft(){
     var raw = localStorage.getItem(DRAFT_KEY);
     if(raw) stored = JSON.parse(raw);
   }catch(e){ stored = null; }
-  if(stored && JSON.stringify(stored) !== JSON.stringify(data)){
-    draft = stored; draftDirty = true;
-  }else{
-    draft = clone(data); draftDirty = false;
+
+  /* Older drafts were stored bare, with no base - those cannot be trusted
+     either, so they take the stale path. */
+  if(stored && stored.base === PUBLISHED_FP && stored.data &&
+     JSON.stringify(stored.data) !== JSON.stringify(data)){
+    draft = stored.data; draftDirty = true; return;
   }
+  if(stored){
+    try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
+    staleDraftDropped = true;
+  }
+  draft = clone(data); draftDirty = false;
 }
 function touchDraft(){
   draftDirty = true;
-  try{ localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); }catch(e){}
+  staleDraftDropped = false;
+  try{
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({base: PUBLISHED_FP, data: draft}));
+  }catch(e){}
 }
 function dropDraft(){
   try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
-  draft = clone(data); draftDirty = false;
+  draft = clone(data); draftDirty = false; staleDraftDropped = false;
 }
 function findDraftPerson(id){
   for(var i=0;i<draft.areas.length;i++){
@@ -1129,6 +1149,10 @@ function viewEditor(){
       (!STATIC_HOST && readOnly
         ? '<div class="note bad"><b>You have view-only access.</b> Changes you make here stay in this browser and reach nobody. ' +
           'Ask the owner of this artifact for edit access, or use <b>Copy data (JSON)</b> and send it to them.</div>'
+        : '') +
+      (staleDraftDropped
+        ? '<div class="note">This page was updated since you last edited it in this browser, so the old ' +
+          'half-finished draft was discarded. You are editing the current version.</div>'
         : '') +
       (draftDirty ? '<div class="note warn">You have unpublished changes. Press <b>Publish</b> to make them live for everyone.' +
         '<div class="row">' + (confirmDiscard
