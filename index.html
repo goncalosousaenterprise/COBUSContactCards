@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Cobus Contact Cards</title>
-
 <style id="app-style">
 /* Matter — Displaay Type Foundry, licensed to CaetanoBus for web use.
    Subset to Latin + Latin Extended-A and served via @font-face, which is
@@ -247,11 +246,6 @@ code{
   font-size:11px;letter-spacing:.16em;text-transform:uppercase;
   color:rgba(255,255,255,.78);text-align:center;
 }
-.card .mail{
-  margin-top:16px;font-weight:600;font-size:14.5px;letter-spacing:.01em;
-  color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.3);
-  padding-bottom:2px;word-break:break-all;text-align:center;
-}
 .qrwrap{
   margin-top:20px;background:#fff;border-radius:10px;padding:9px;
   box-shadow:0 10px 26px rgba(5,20,55,.25);line-height:0;
@@ -286,12 +280,6 @@ code{
   transition:background .15s ease, transform .15s ease;
 }
 .social:hover{background:rgba(255,255,255,.3);transform:translateY(-2px)}
-.savevcf{
-  margin-top:20px;background:none;color:rgba(255,255,255,.7);
-  font-family:var(--font);font-size:10.5px;letter-spacing:.12em;
-  text-transform:uppercase;display:inline-flex;align-items:center;gap:7px;
-}
-.savevcf:hover{color:#fff}
 
 /* ---------------- editor ---------------- */
 .ed{max-width:520px;margin:0 auto;min-height:100vh;background:var(--surface);display:flex;flex-direction:column}
@@ -366,11 +354,17 @@ code{
   font-family:var(--font);font-size:10px;letter-spacing:.13em;
   text-transform:uppercase;color:var(--ink-2);
 }
-.field input,.field textarea{
+.field input,.field textarea,.field select{
   border:1px solid var(--line);background:var(--surface-2);border-radius:10px;
   padding:11px 13px;font-size:14.5px;width:100%;
 }
-.field input:focus,.field textarea:focus{outline:none;border-color:var(--brand);background:var(--surface)}
+.field select{
+  appearance:none;-webkit-appearance:none;cursor:pointer;
+  padding-right:36px;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235A6B85' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 11px center;background-size:16px;
+}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--brand);background-color:var(--surface)}
 .field .help{font-size:11.5px;color:var(--ink-3)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media (max-width:400px){.grid2{grid-template-columns:1fr}}
@@ -973,12 +967,15 @@ function bindHome(){
 }
 
 /* ---------- person card ---------- */
+function pill(href, iconName, label, blank){
+  return '<a class="pill" href="' + attr(href) + '"' +
+         (blank ? ' target="_blank" rel="noopener"' : '') + '>' +
+         '<span class="badge">' + icon(iconName, 17) + '</span>' +
+         '<span>' + esc(label) + '</span></a>';
+}
+
 function viewPerson(p){
-  var contactHref = p.mobile ? "tel:"+p.mobile.replace(/\s+/g,"")
-                  : p.phone ? "tel:"+p.phone.replace(/\s+/g,"")
-                  : p.email ? "mailto:"+p.email : "";
-  var contactIcon = (p.mobile || p.phone) ? "phone" : "mail";
-  var contactLabel = (p.mobile || p.phone) ? "Contact me" : "Email me";
+  var tel = p.mobile || p.phone;
 
   var socials = "";
   [["instagram","ig","Instagram"],["linkedin","li","LinkedIn"],["website","globe","Website"]].forEach(function(s){
@@ -1000,14 +997,15 @@ function viewPerson(p){
     '</div>' +
     '<h2>'+esc(p.name || "—")+'</h2>' +
     (p.role ? '<div class="role">'+esc(p.role)+'</div>' : '') +
-    (p.email ? '<a class="mail" href="mailto:'+attr(p.email)+'">'+esc(p.email)+'</a>' : '') +
     (qr ? '<div class="qrwrap">'+qr+'</div><div class="qrcap">Scan to save contact</div>' : '') +
     '<div class="actions">' +
-      (contactHref ? '<a class="pill" href="'+attr(contactHref)+'"><span class="badge">'+icon(contactIcon,17)+'</span><span>'+contactLabel+'</span></a>' : '') +
-      (p.meeting ? '<a class="pill" href="'+attr(tidyUrl(p.meeting))+'" target="_blank" rel="noopener"><span class="badge">'+icon("cal",17)+'</span><span>Schedule a meeting</span></a>' : '') +
+      (tel ? pill("tel:" + tel.replace(/\s+/g,""), "phone", "Call me") : '') +
+      (p.email ? pill("mailto:" + p.email, "mail", "Email me") : '') +
+      (p.meeting ? pill(tidyUrl(p.meeting), "cal", "Schedule a meeting", true) : '') +
+      '<button class="pill" data-act="vcf">' +
+        '<span class="badge">'+icon("save",17)+'</span><span>Save contact</span></button>' +
     '</div>' +
     (socials ? '<div class="socials">'+socials+'</div>' : '') +
-    '<button class="savevcf" data-act="vcf">'+icon("save",14)+'Save contact (.vcf)</button>' +
   '</article>';
 }
 function bindPerson(p){
@@ -1321,6 +1319,12 @@ function viewPersonForm(id){
           (p.photo ? '<button class="btn sm danger" data-act="clear-photo">Remove</button>' : '') +
         '</span>' +
       '</div><span class="help">Portrait orientation (3:4). Resized automatically.</span></div>' +
+      '<div class="field"><label>Area</label><select data-move-area>' +
+        draft.areas.map(function(a){
+          return '<option value="'+attr(a.id)+'"'+(a.id === hit.area.id ? ' selected' : '')+'>' +
+                 esc(a.name || "(unnamed area)") + '</option>';
+        }).join("") +
+      '</select><span class="help">Changing this moves the person to that area.</span></div>' +
       grid +
       '<div class="note">Only the fields you fill in show up on the card. The Instagram, LinkedIn, website and location icons appear only when they have a link.</div>' +
       (pendingDelete === p.id
@@ -1345,6 +1349,22 @@ function bindPersonForm(id){
       var h = root.querySelector(".ed-bar h2");
       if(h) h.textContent = p.name || "New person";
     }
+  });
+  root.addEventListener("change", function(e){
+    if(!e.target.hasAttribute("data-move-area")) return;
+    var targetId = e.target.value;
+    var from = findDraftPerson(p.id);
+    if(!from || from.area.id === targetId) return;
+    var to = null;
+    for(var i = 0; i < draft.areas.length; i++){
+      if(draft.areas[i].id === targetId){ to = draft.areas[i]; break; }
+    }
+    if(!to) return;
+    from.area.people.splice(from.pi, 1);
+    to.people.push(p);
+    touchDraft();
+    toast("Moved to " + (to.name || "that area") + ".");
+    render();
   });
   root.addEventListener("click", function(e){
     var el = e.target.closest("[data-act]"); if(!el) return;
