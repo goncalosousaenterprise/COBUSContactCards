@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Cobus Contact Cards</title>
-
 <style id="app-style">
 /* Matter — Displaay Type Foundry, licensed to CaetanoBus for web use.
    Subset to Latin + Latin Extended-A and served via @font-face, which is
@@ -199,88 +198,94 @@ code{
 .hint button{color:inherit;opacity:.7;flex:none;display:flex}
 
 /* ---------------- card ---------------- */
+/* Light Cobus sky: pale blue ground, a soft band across the upper third and
+   the brand swoosh sweeping up from the lower left. */
 .card{
+  /* Same column as the list, so the card does not stretch on a desktop. */
+  max-width:460px;margin:0 auto;
   min-height:100vh;position:relative;overflow:hidden;isolation:isolate;
-  background:linear-gradient(158deg,#4A80E2 0%,#2A61CE 34%,#153A8E 68%,#0A2258 100%);
-  color:#fff;
+  background:
+    radial-gradient(110% 34% at 50% 40%, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 72%),
+    linear-gradient(178deg,#A4C8EC 0%,#93B9E4 34%,#82AADE 62%,#6E9AD6 100%);
+  color:#0B2B5E;
   display:flex;flex-direction:column;align-items:center;
   padding:calc(16px + env(safe-area-inset-top)) 24px calc(28px + env(safe-area-inset-bottom));
   animation:cardIn .32s cubic-bezier(.2,.8,.3,1);
 }
 @keyframes cardIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
-.card::before{
-  content:"";position:absolute;inset:0;z-index:-2;
-  background:radial-gradient(80% 55% at 82% 8%, rgba(255,255,255,.28) 0%, rgba(255,255,255,0) 62%);
-}
-.card .swoosh{position:absolute;inset:0;z-index:-1;opacity:.13;pointer-events:none}
-/* Back button, logo, spacer. A grid centres the logo on the card itself
-   rather than in the space left over beside the button. */
+.card .swoosh{position:absolute;inset:0;z-index:-1;opacity:1;pointer-events:none}
+
 .card-top{
   width:100%;display:grid;grid-template-columns:38px 1fr 38px;
   align-items:center;gap:12px;margin-bottom:14px;
 }
 .iconbtn{
   width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
-  background:rgba(255,255,255,.14);color:#fff;flex:none;
+  background:rgba(255,255,255,.55);color:#12386F;flex:none;
   transition:background .15s ease;
 }
-.iconbtn:hover{background:rgba(255,255,255,.26)}
+.iconbtn:hover{background:rgba(255,255,255,.85)}
 .card-top .wordmark{grid-column:2;justify-self:center;margin:0}
-.card-top .wordmark span{font-size:22px}
+.card-top .wordmark span{font-size:22px;color:#0A2350}
+/* The stored logo is the white brand file; on this pale ground it needs to
+   read dark, so it is knocked back to the ink colour. */
+.card-top .wordmark img{filter:brightness(0) saturate(100%) opacity(.88)}
 
 .portrait{
-  width:132px;height:164px;border-radius:8px;overflow:hidden;flex:none;
-  background:rgba(255,255,255,.16);
-  box-shadow:0 14px 34px rgba(5,20,55,.35);
+  width:132px;height:164px;border-radius:12px;overflow:hidden;flex:none;
+  background:rgba(255,255,255,.5);
+  box-shadow:0 16px 34px rgba(23,60,120,.22);
   display:grid;place-items:center;margin-top:8px;
 }
 .portrait img{width:100%;height:100%;object-fit:cover;display:block}
-.portrait .ini{font-family:var(--font);font-weight:700;font-size:38px;color:rgba(255,255,255,.85);letter-spacing:-.02em}
+.portrait .ini{font-family:var(--font);font-weight:700;font-size:38px;color:#4E7FC4;letter-spacing:-.02em}
 
 .card h2{
-  margin:22px 0 0;font-family:var(--font);font-weight:700;
-  font-size:clamp(28px,8vw,34px);line-height:1.08;letter-spacing:-.025em;
-  text-align:center;text-wrap:balance;
+  margin:20px 0 0;font-family:var(--font);font-weight:700;
+  font-size:clamp(28px,8vw,34px);line-height:1.1;letter-spacing:-.02em;
+  text-align:center;text-wrap:balance;color:#fff;
+  text-shadow:0 1px 10px rgba(20,52,105,.28);
 }
 .card .role{
-  margin-top:12px;font-family:var(--font);
-  font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-  color:rgba(255,255,255,.78);text-align:center;
+  margin-top:8px;font-family:var(--font);font-weight:500;
+  font-size:12.5px;letter-spacing:.02em;
+  color:#fff;text-align:center;
+  text-shadow:0 1px 8px rgba(20,52,105,.3);
 }
 .qrwrap{
-  margin-top:20px;background:#fff;border-radius:10px;padding:9px;
-  box-shadow:0 10px 26px rgba(5,20,55,.25);line-height:0;
+  margin-top:22px;background:#fff;border-radius:8px;padding:6px;
+  box-shadow:0 8px 20px rgba(23,60,120,.18);line-height:0;
 }
-.qrwrap svg{display:block;width:112px;height:112px}
+.qrwrap svg{display:block;width:92px;height:92px}
 .qrcap{
   margin-top:9px;font-family:var(--font);font-size:9.5px;
-  letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.6);
+  letter-spacing:.13em;text-transform:uppercase;color:rgba(16,52,110,.62);
 }
 
-.actions{width:100%;max-width:320px;margin-top:24px;display:flex;flex-direction:column;gap:11px}
+.actions{width:100%;max-width:320px;margin-top:22px;display:flex;flex-direction:column;gap:10px}
 .pill{
-  display:flex;align-items:center;gap:12px;width:100%;
-  background:#fff;color:#123; border-radius:999px;padding:7px 20px 7px 7px;
-  font-family:var(--font);font-weight:600;font-size:12px;
-  letter-spacing:.13em;text-transform:uppercase;text-decoration:none;
-  box-shadow:0 6px 18px rgba(5,20,55,.2);
-  transition:transform .14s ease, box-shadow .14s ease;
+  display:flex;align-items:center;gap:10px;width:100%;
+  background:rgba(255,255,255,.94);border-radius:999px;padding:5px 18px 5px 5px;
+  font-family:var(--font);font-weight:600;font-size:11.5px;
+  letter-spacing:.12em;text-transform:uppercase;text-decoration:none;
+  box-shadow:0 4px 14px rgba(23,60,120,.16);
+  transition:transform .14s ease, box-shadow .14s ease, background .14s ease;
 }
-.pill:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(5,20,55,.28)}
+.pill:hover{transform:translateY(-1px);background:#fff;box-shadow:0 8px 20px rgba(23,60,120,.24)}
 .pill:active{transform:translateY(0)}
 .pill .badge{
-  width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;
-  background:#1E56C8;color:#fff;
+  width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:#DCEAF9;color:#1E56C8;
 }
-.pill span{flex:1;text-align:center;transform:translateX(-17px);color:#0C2A66}
+.pill span{flex:1;text-align:center;transform:translateX(-15px);color:#123D7C}
 
-.socials{display:flex;gap:14px;margin-top:26px}
+.socials{display:flex;gap:14px;margin-top:24px}
 .social{
   width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
-  background:rgba(255,255,255,.16);color:#fff;text-decoration:none;
+  background:rgba(255,255,255,.62);color:#1E56C8;text-decoration:none;
   transition:background .15s ease, transform .15s ease;
 }
-.social:hover{background:rgba(255,255,255,.3);transform:translateY(-2px)}
+.social:hover{background:#fff;transform:translateY(-2px)}
 
 /* ---------------- editor ---------------- */
 .ed{max-width:520px;margin:0 auto;min-height:100vh;background:var(--surface);display:flex;flex-direction:column}
@@ -520,6 +525,35 @@ function swoosh(){
     '<path d="M470 -60 C300 60 250 190 300 330 C345 455 300 560 150 660 L470 700 Z" fill="#fff"/>' +
     '<path d="M520 120 C380 210 350 320 385 430 L520 470 Z" fill="#fff" opacity=".55"/>' +
     '</svg>';
+}
+
+/* Reproduction of the Cobus card backdrop: pale sky, a soft light band across
+   the upper third, the brand curve sweeping up from the lower left, and the
+   small lobe hugging the right edge. Vector, so it costs about 1 KB. */
+function cardBackdrop(){
+  return '<svg class="swoosh" viewBox="0 0 400 860" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' +
+    '<defs>' +
+      '<linearGradient id="cbBand" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="#fff" stop-opacity="0"/>' +
+        '<stop offset=".55" stop-color="#fff" stop-opacity=".55"/>' +
+        '<stop offset="1" stop-color="#fff" stop-opacity="0"/>' +
+      '</linearGradient>' +
+      '<linearGradient id="cbSweep" x1="0" y1="1" x2="1" y2="0">' +
+        '<stop offset="0" stop-color="#fff" stop-opacity=".78"/>' +
+        '<stop offset=".62" stop-color="#fff" stop-opacity=".34"/>' +
+        '<stop offset="1" stop-color="#fff" stop-opacity=".12"/>' +
+      '</linearGradient>' +
+      '<linearGradient id="cbLobe" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0" stop-color="#fff" stop-opacity=".62"/>' +
+        '<stop offset="1" stop-color="#fff" stop-opacity=".18"/>' +
+      '</linearGradient>' +
+    '</defs>' +
+    '<rect x="-20" y="285" width="440" height="120" fill="url(#cbBand)"/>' +
+    '<path d="M-20 880 L -20 712 C 90 700, 224 626, 322 520 C 360 478, 398 442, 420 420 ' +
+      'L 420 880 Z" fill="url(#cbSweep)"/>' +
+    '<path d="M420 356 C 388 368, 370 394, 376 424 C 381 450, 400 464, 420 468 Z" ' +
+      'fill="url(#cbLobe)"/>' +
+  '</svg>';
 }
 
 function wordmark(){
@@ -987,7 +1021,7 @@ function viewPerson(p){
   var qr = "";
   try{ qr = qrSvg(vcard(p), "#0C2A66"); }catch(e){ qr = ""; }
 
-  return '<article class="card">' + swoosh() +
+  return '<article class="card">' + cardBackdrop() +
     '<div class="card-top">' +
       '<button class="iconbtn" data-act="back" aria-label="Back">'+icon("back",20)+'</button>' +
       wordmark() +
